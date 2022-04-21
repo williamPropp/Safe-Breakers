@@ -9,6 +9,7 @@ var clockwise = true
 var combo_term1 = "000"
 var combo_term2 = "000"
 var combo_term3 = "000"
+var skip_tolerance = 20
 
 var is_dragging = false
 
@@ -17,10 +18,10 @@ func _ready():
 	pass
 
 func _process(delta):
-	if(prev_term_value > current_term_value && clockwise):
+	if(prev_term_value > current_term_value && abs(prev_term_value - current_term_value) < skip_tolerance && clockwise):
 		current_combo_term += 1
 		clockwise = false
-	elif(prev_term_value > current_term_value && !clockwise):
+	elif(prev_term_value < current_term_value && abs(prev_term_value - current_term_value) < skip_tolerance && !clockwise):
 		current_combo_term += 1
 		clockwise = true
 	
@@ -29,6 +30,7 @@ func _process(delta):
 		combo_term2 = "000"
 		combo_term3 = "000"
 		current_combo_term = 1
+	
 	match(current_combo_term):
 		1:
 			combo_term1 = term_to_string(current_term_value)
@@ -94,8 +96,10 @@ func term_to_string(raw_term):
 	raw_term = int(raw_term)
 	if(raw_term == 0):
 		return "000"
+	
 	var multiplied_term = raw_term
 	var prefix = ""
+	
 	for i in 2:
 		multiplied_term *= 10
 		if(multiplied_term > 0 && multiplied_term < 1000):
