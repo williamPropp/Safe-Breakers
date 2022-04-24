@@ -1,5 +1,7 @@
 extends Sprite
 
+var testi = 0
+
 var rng = RandomNumberGenerator.new()
 
 var click_pos = Vector2.ZERO
@@ -9,9 +11,15 @@ var prev_term_value = 0
 var current_term_value = 0
 var current_combo_term = 1
 
+# combo term label nodes
+onready var term1_label = get_node("../combo_term1")
+onready var term2_label = get_node("../combo_term2")
+onready var term3_label = get_node("../combo_term3")
+
 var combo_term1 = "000"
 var combo_term2 = "000"
 var combo_term3 = "000"
+
 var prev_term1_text = "000"
 var prev_term2_text = "000"
 var prev_term3_text = "000"
@@ -31,24 +39,28 @@ func _ready():
 #	OS.window_fullscreen = true
 	generate_rand_combination()
 	connect("safe_tick", self, "play_sfx_tick")
-	pass
+	
+#	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
+#	print(solution)
 
 func _process(delta):
-	
-	if(prev_term_value > current_term_value && abs(prev_term_value - current_term_value) < skip_tolerance && clockwise):
+	# on direction change, move on to the next combo term
+	if(prev_term_value < current_term_value && abs(prev_term_value - current_term_value) < skip_tolerance && clockwise):
 		current_combo_term += 1
 		clockwise = false
 		
-	elif(prev_term_value < current_term_value && abs(prev_term_value - current_term_value) < skip_tolerance && !clockwise):
+	elif(prev_term_value > current_term_value && abs(prev_term_value - current_term_value) < skip_tolerance && !clockwise):
 		current_combo_term += 1
 		clockwise = true
 	
+	# reset terms after third direction change
 	if(current_combo_term > 3):
 		combo_term1 = "000"
 		combo_term2 = "000"
 		combo_term3 = "000"
 		current_combo_term = 1
 	
+	# only update current combo term
 	match(current_combo_term):
 		1:
 			combo_term1 = term_to_string(current_term_value)
@@ -58,9 +70,9 @@ func _process(delta):
 			combo_term3 = term_to_string(current_term_value)
 
 func _input(event):
-	
+	# store term value to check for updates
 	prev_term_value = get_term_value()
-#	print("prev term = " + str(prev_term_value))
+	
 	# tests whether a click occured within the area of the sprite
 	if Input.is_action_just_pressed("left_mouse") && get_rect().has_point(to_local(event.position)):
 		# update click_pos offset and is_dragging state
@@ -100,24 +112,33 @@ func angle_diff(c : Vector2, p0 : Vector2, p1 : Vector2):
 	
 	# convert to degrees before returning
 	var angle_delta_deg = rad2deg(angle_delta_rad)
-	
-	# convert any angles above or below the range (0,359) to its corresponding angle in that range
-#	angle_delta_deg = ( (int(angle_delta_deg) % 360) + 360 ) % 360
-#	angle_delta_deg = int( floor(angle_delta_deg) ) % 360
+
 	return angle_delta_deg
 
+# calculate the term value from the rotation value and convert it to the correct type
 func get_term_value():
 	var calculated_term_value = self.rotation_degrees / 3
-	return int( floor(calculated_term_value) )
+	
+	# round down from rotation_degrees float value
+	calculated_term_value = int( floor(calculated_term_value) )
+	
+	# make sure term direction aligns with dial sprite marks and 0 doesn't become 120
+	if(calculated_term_value != 0): calculated_term_value = abs(120-calculated_term_value)
+	
+	return calculated_term_value
 
+# add additional prefix zeros to term
 func term_to_string(raw_term):
 	raw_term = int(raw_term)
+	
+	# avoid multiply by zero errors
 	if(raw_term == 0):
 		return "000"
 	
 	var multiplied_term = raw_term
 	var prefix = ""
 	
+	# add prefix zero for every power of 10 not in the raw_term up to 1000
 	for i in 2:
 		multiplied_term *= 10
 		if(multiplied_term > 0 && multiplied_term < 1000):
@@ -126,46 +147,50 @@ func term_to_string(raw_term):
 	return prefix + str(raw_term)
 	
 
+# update combo term labels and check for term updates to play 
 func update_combination():
-	var term1 = get_node("../combo_term1")
-	var term2 = get_node("../combo_term2")
-	var term3 = get_node("../combo_term3")
+	# store prev_terms to check for term updates
+	prev_term1_text = term1_label.text
+	prev_term2_text = term2_label.text
+	prev_term3_text = term3_label.text
 	
-	prev_term1_text = term1.text
-	prev_term2_text = term2.text
-	prev_term3_text = term3.text
+	# set combo labels to combo_terms
+	term1_label.text = str(combo_term1)
+	term2_label.text = str(combo_term2)
+	term3_label.text = str(combo_term3)
 	
-	term1.text = str(combo_term1)
-	term2.text = str(combo_term2)
-	term3.text = str(combo_term3)
-	
-	if(term1.text != prev_term1_text || term2.text != prev_term2_text || term3.text != prev_term3_text):
+	# on term update, play tick sound
+	if(term1_label.text != prev_term1_text || term2_label.text != prev_term2_text || term3_label.text != prev_term3_text):
 		emit_signal("safe_tick")
+		testi += 1
+		print(testi)
 
+# generate random safe combination
 func generate_rand_combination():
 	rng.randomize()
 	solution_term1 = rng.randi_range(1,119)
 	solution_term2 = rng.randi_range(1,119)
 	solution_term3 = rng.randi_range(1,119)
 
+# play safe tick sound effect
 func play_sfx_tick():
-	#create new stream player and add it to the scene
+	# create new stream player and add it to the scene
 	var new_stream_player = AudioStreamPlayer.new()
 	add_child(new_stream_player)
 	
-	#choose random tick sound effect
+	# choose random tick sound effect
 	var sample_number = rng.randi_range(1,4)
 	var sample_path = "res://sound assets/Safe-Tick-" + str(sample_number) + ".mp3"
 	
-	#load the matching audio path
+	# load the random audio path
 	var sound_to_play = load(sample_path)
 	
-	#create new stream player instance to host the sound, then play the sound
+	# create new stream player instance to host the sound, then play the sound
 	new_stream_player.stream = sound_to_play
 	new_stream_player.bus = "SoundFx"
 	new_stream_player.play(0.0)
 	
-	#delete node once the sample finishes playing
+	# delete node once the sample finishes playing
 	yield(new_stream_player, "finished")
 	new_stream_player.stop()
 	new_stream_player.queue_free()
