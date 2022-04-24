@@ -38,8 +38,8 @@ func _ready():
 	generate_rand_combination()
 	connect("safe_tick", self, "play_sfx_tick")
 	
-#	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
-#	print(solution)
+	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
+	print(solution)
 
 func _process(delta):
 	# on direction change, move on to the next combo term
@@ -99,6 +99,7 @@ func _input(event):
 		current_term_value = get_term_value()
 		
 	update_combination()
+	test_solution()
 
 
 # calculate the angle between 2 points about a center point
@@ -190,3 +191,13 @@ func play_sfx_tick():
 	yield(new_stream_player, "finished")
 	new_stream_player.stop()
 	new_stream_player.queue_free()
+
+func test_solution():
+	var term1_value = int(term1_label.text)
+	var term2_value = int(term2_label.text)
+	var term3_value = int(term3_label.text)
+	if(solution_term1 == term1_value && solution_term2 == term2_value && solution_term3 == term3_value):
+		print("you win!")
+		return true
+	else:
+		return false
