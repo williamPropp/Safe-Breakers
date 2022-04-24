@@ -1,26 +1,44 @@
 extends Sprite
 
+var rng = RandomNumberGenerator.new()
+
 var click_pos = Vector2.ZERO
 var dial_rotation = 0
+
 var prev_term_value = 0
 var current_term_value = 0
 var current_combo_term = 1
-var clockwise = true
+
 var combo_term1 = "000"
 var combo_term2 = "000"
 var combo_term3 = "000"
+var prev_term1_text = "000"
+var prev_term2_text = "000"
+var prev_term3_text = "000"
+
+var clockwise = true
 var skip_tolerance = 20
+
+var solution_term1
+var solution_term2
+var solution_term3
 
 var is_dragging = false
 
+signal safe_tick
+
 func _ready():
 #	OS.window_fullscreen = true
+	generate_rand_combination()
+	connect("safe_tick", self, "play_sfx_tick")
 	pass
 
 func _process(delta):
+	
 	if(prev_term_value > current_term_value && abs(prev_term_value - current_term_value) < skip_tolerance && clockwise):
 		current_combo_term += 1
 		clockwise = false
+		
 	elif(prev_term_value < current_term_value && abs(prev_term_value - current_term_value) < skip_tolerance && !clockwise):
 		current_combo_term += 1
 		clockwise = true
@@ -112,8 +130,42 @@ func update_combination():
 	var term1 = get_node("../combo_term1")
 	var term2 = get_node("../combo_term2")
 	var term3 = get_node("../combo_term3")
+	
+	prev_term1_text = term1.text
+	prev_term2_text = term2.text
+	prev_term3_text = term3.text
+	
 	term1.text = str(combo_term1)
 	term2.text = str(combo_term2)
 	term3.text = str(combo_term3)
+	
+	if(term1.text != prev_term1_text || term2.text != prev_term2_text || term3.text != prev_term3_text):
+		emit_signal("safe_tick")
 
+func generate_rand_combination():
+	rng.randomize()
+	solution_term1 = rng.randi_range(1,119)
+	solution_term2 = rng.randi_range(1,119)
+	solution_term3 = rng.randi_range(1,119)
 
+func play_sfx_tick():
+	#create new stream player and add it to the scene
+	var new_stream_player = AudioStreamPlayer.new()
+	add_child(new_stream_player)
+	
+	#choose random tick sound effect
+	var sample_number = rng.randi_range(1,4)
+	var sample_path = "res://sound assets/Safe-Tick-" + str(sample_number) + ".mp3"
+	
+	#load the matching audio path
+	var sound_to_play = load(sample_path)
+	
+	#create new stream player instance to host the sound, then play the sound
+	new_stream_player.stream = sound_to_play
+	new_stream_player.bus = "SoundFx"
+	new_stream_player.play(0.0)
+	
+	#delete node once the sample finishes playing
+	yield(new_stream_player, "finished")
+	new_stream_player.stop()
+	new_stream_player.queue_free()
