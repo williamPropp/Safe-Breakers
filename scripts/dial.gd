@@ -1,7 +1,5 @@
 extends Sprite
 
-var testi = 0
-
 var rng = RandomNumberGenerator.new()
 
 var click_pos = Vector2.ZERO
@@ -162,8 +160,6 @@ func update_combination():
 	# on term update, play tick sound
 	if(term1_label.text != prev_term1_text || term2_label.text != prev_term2_text || term3_label.text != prev_term3_text):
 		emit_signal("safe_tick")
-		testi += 1
-		print(testi)
 
 # generate random safe combination
 func generate_rand_combination():

@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://fonts/SourceSerifPro-Regular.ttf" type="DynamicFontData" id=1]
-[ext_resource path="res://dial.gd" type="Script" id=2]
-[ext_resource path="res://art assets/Dial1_5.png" type="Texture" id=3]
+[ext_resource path="res://art assets/Dial_Outline_1_1.png" type="Texture" id=2]
+[ext_resource path="res://scripts/dial.gd" type="Script" id=3]
+[ext_resource path="res://art assets/Dial1_5.png" type="Texture" id=4]
 
 [sub_resource type="DynamicFont" id=1]
 size = 80
@@ -20,35 +21,40 @@ margin_right = 1297.0
 margin_bottom = 741.0
 color = Color( 0.180392, 0.196078, 0.262745, 1 )
 
+[node name="dial_outline" type="Sprite" parent="."]
+position = Vector2( 640, 360 )
+scale = Vector2( 0.84, 0.84 )
+texture = ExtResource( 2 )
+
 [node name="dial" type="Sprite" parent="."]
 position = Vector2( 640, 360 )
 scale = Vector2( 0.7, 0.7 )
-texture = ExtResource( 3 )
-script = ExtResource( 2 )
+texture = ExtResource( 4 )
+script = ExtResource( 3 )
 
 [node name="combo_term1" type="RichTextLabel" parent="."]
-margin_left = 425.0
-margin_top = 42.0
-margin_right = 574.0
-margin_bottom = 155.0
+margin_left = 426.0
+margin_top = 21.0
+margin_right = 575.0
+margin_bottom = 134.0
 theme = SubResource( 2 )
 tab_size = 7
 text = "000"
 
 [node name="combo_term2" type="RichTextLabel" parent="."]
-margin_left = 580.0
-margin_top = 42.0
-margin_right = 729.0
-margin_bottom = 155.0
+margin_left = 581.0
+margin_top = 21.0
+margin_right = 730.0
+margin_bottom = 134.0
 theme = SubResource( 2 )
 tab_size = 7
 text = "000"
 
 [node name="combo_term3" type="RichTextLabel" parent="."]
-margin_left = 727.0
-margin_top = 42.0
-margin_right = 876.0
-margin_bottom = 155.0
+margin_left = 728.0
+margin_top = 21.0
+margin_right = 877.0
+margin_bottom = 134.0
 theme = SubResource( 2 )
 tab_size = 7
 text = "000"
