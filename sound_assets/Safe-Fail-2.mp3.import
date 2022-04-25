@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/Safe-Fail-2.mp3-24ae4a4ddacb1fd6aa582c8f6d3163a3.mp3str"
+
+[deps]
+
+source_file="res://sound_assets/Safe-Fail-2.mp3"
+dest_files=[ "res://.import/Safe-Fail-2.mp3-24ae4a4ddacb1fd6aa582c8f6d3163a3.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0

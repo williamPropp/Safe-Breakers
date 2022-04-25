@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/Safe-Tick-2.mp3-3f4423273c711b0a303c9566399a8fbf.mp3str"
+
+[deps]
+
+source_file="res://sound_assets/Safe-Tick-2.mp3"
+dest_files=[ "res://.import/Safe-Tick-2.mp3-3f4423273c711b0a303c9566399a8fbf.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0

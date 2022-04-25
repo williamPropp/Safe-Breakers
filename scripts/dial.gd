@@ -14,6 +14,8 @@ onready var term1_label = get_node("../combo_term1")
 onready var term2_label = get_node("../combo_term2")
 onready var term3_label = get_node("../combo_term3")
 
+onready var handle = get_node("../handle")
+
 var combo_term1 = "000"
 var combo_term2 = "000"
 var combo_term3 = "000"
@@ -36,7 +38,7 @@ signal safe_tick
 func _ready():
 #	OS.window_fullscreen = true
 	generate_rand_combination()
-	connect("safe_tick", self, "play_sfx_tick")
+	connect("safe_tick", self, "play_safe_tick")
 	
 	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
 	print(solution)
@@ -58,14 +60,18 @@ func _process(delta):
 		combo_term3 = "000"
 		current_combo_term = 1
 	
-	# only update current combo term
+	# only update current combo term and update safe tick sfx pitch
 	match(current_combo_term):
 		1:
 			combo_term1 = term_to_string(current_term_value)
+			change_bus_pitch(combo_term1, solution_term1)
 		2:
 			combo_term2 = term_to_string(current_term_value)
+			change_bus_pitch(combo_term2, solution_term2)
 		3:
 			combo_term3 = term_to_string(current_term_value)
+			change_bus_pitch(combo_term3, solution_term3)
+			
 
 func _input(event):
 	# store term value to check for updates
@@ -99,7 +105,11 @@ func _input(event):
 		current_term_value = get_term_value()
 		
 	update_combination()
-	test_solution()
+	
+	if(test_solution()):
+		handle.locked = false
+	else:
+		handle.locked = true
 
 
 # calculate the angle between 2 points about a center point
@@ -170,21 +180,21 @@ func generate_rand_combination():
 	solution_term3 = rng.randi_range(1,119)
 
 # play safe tick sound effect
-func play_sfx_tick():
+func play_safe_tick():
 	# create new stream player and add it to the scene
 	var new_stream_player = AudioStreamPlayer.new()
 	add_child(new_stream_player)
 	
 	# choose random tick sound effect
 	var sample_number = rng.randi_range(1,4)
-	var sample_path = "res://sound assets/Safe-Tick-" + str(sample_number) + ".mp3"
+	var sample_path = "res://sound_assets/Safe-Tick-" + str(sample_number) + ".mp3"
 	
 	# load the random audio path
 	var sound_to_play = load(sample_path)
 	
 	# create new stream player instance to host the sound, then play the sound
 	new_stream_player.stream = sound_to_play
-	new_stream_player.bus = "SoundFx"
+	new_stream_player.bus = "SafeTick"
 	new_stream_player.play(0.0)
 	
 	# delete node once the sample finishes playing
@@ -197,7 +207,21 @@ func test_solution():
 	var term2_value = int(term2_label.text)
 	var term3_value = int(term3_label.text)
 	if(solution_term1 == term1_value && solution_term2 == term2_value && solution_term3 == term3_value):
-		print("you win!")
 		return true
 	else:
 		return false
+
+func change_bus_pitch(combo_term_value, solution_value):
+#	var new_pitch_scale = abs( float(combo_term_value) - solution_value ) + 1
+#	var new_pitch_scale = abs( int(combo_term_value) - solution_value ) + 60
+#	new_pitch_scale = abs( (new_pitch_scale % 120) - 60 )
+#	new_pitch_scale = ( float(new_pitch_scale) / 2000 ) + 1
+#	print(new_pitch_scale)
+#	var bus_pitch = AudioServer.get_bus_effect(AudioServer.get_bus_index("SafeTick"),1)
+#	bus_pitch.pitch_scale = new_pitch_scale
+
+	var new_cutoff = abs( int(combo_term_value) - solution_value ) + 60
+	new_cutoff = abs( (new_cutoff % 120) - 60 )
+	new_cutoff = (new_cutoff * 50) + 1000
+	var bus_cutoff = AudioServer.get_bus_effect(AudioServer.get_bus_index("SafeTick"),1)
+	bus_cutoff.cutoff_hz = new_cutoff
