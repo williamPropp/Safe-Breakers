@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Dial1_5.png-be077b36cc157035d10c632fc3404ada.stex"
+path="res://.import/Dial1_6.png-b35637a06ea1f3ea0e786601e7b9630e.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art assets/Dial1_5.png"
-dest_files=[ "res://.import/Dial1_5.png-be077b36cc157035d10c632fc3404ada.stex" ]
+source_file="res://art assets/Dial1_6.png"
+dest_files=[ "res://.import/Dial1_6.png-b35637a06ea1f3ea0e786601e7b9630e.stex" ]
 
 [params]
 

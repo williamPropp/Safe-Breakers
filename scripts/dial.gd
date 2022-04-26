@@ -2,12 +2,12 @@ extends Sprite
 
 var rng = RandomNumberGenerator.new()
 
-var click_pos = Vector2.ZERO
-var dial_rotation = 0
+var click_pos
+var dial_rotation
 
-var prev_term_value = 0
-var current_term_value = 0
-var current_combo_term = 1
+var prev_term_value
+var current_term_value
+var current_combo_term
 
 # combo term label nodes
 onready var term1_label = get_node("../combo_term1")
@@ -16,32 +16,29 @@ onready var term3_label = get_node("../combo_term3")
 
 onready var handle = get_node("../handle")
 
-var combo_term1 = "000"
-var combo_term2 = "000"
-var combo_term3 = "000"
+var combo_term1
+var combo_term2
+var combo_term3
 
-var prev_term1_text = "000"
-var prev_term2_text = "000"
-var prev_term3_text = "000"
+var prev_term1_text
+var prev_term2_text
+var prev_term3_text
 
-var clockwise = true
-var skip_tolerance = 20
+var clockwise
+var skip_tolerance
 
 var solution_term1
 var solution_term2
 var solution_term3
 
-var is_dragging = false
-
-signal safe_tick
+var is_dragging
 
 func _ready():
 #	OS.window_fullscreen = true
-	generate_rand_combination()
-	connect("safe_tick", self, "play_safe_tick")
+	reset_game()
 	
-	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
-	print(solution)
+#	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
+#	print(solution)
 
 func _process(delta):
 	# on direction change, move on to the next combo term
@@ -60,17 +57,17 @@ func _process(delta):
 		combo_term3 = "000"
 		current_combo_term = 1
 	
-	# only update current combo term and update safe tick sfx pitch
+	# only update current combo term and update safe tick sfx filter cutoff
 	match(current_combo_term):
 		1:
 			combo_term1 = term_to_string(current_term_value)
-			change_bus_pitch(combo_term1, solution_term1)
+			tweak_bus_effects(combo_term1, solution_term1)
 		2:
 			combo_term2 = term_to_string(current_term_value)
-			change_bus_pitch(combo_term2, solution_term2)
+			tweak_bus_effects(combo_term2, solution_term2)
 		3:
 			combo_term3 = term_to_string(current_term_value)
-			change_bus_pitch(combo_term3, solution_term3)
+			tweak_bus_effects(combo_term3, solution_term3)
 			
 
 func _input(event):
@@ -170,8 +167,14 @@ func update_combination():
 	
 	# on term update, play tick sound
 	if(term1_label.text != prev_term1_text || term2_label.text != prev_term2_text || term3_label.text != prev_term3_text):
-		emit_signal("safe_tick")
-
+		play_safe_tick()
+		if(int(combo_term1) == solution_term1 && current_combo_term == 1):
+			play_safe_tick(true)
+		elif(int(combo_term2) == solution_term2 && current_combo_term == 2):
+			play_safe_tick(true)
+		elif(int(combo_term3) == solution_term3 && current_combo_term == 3):
+			play_safe_tick(true)
+		
 # generate random safe combination
 func generate_rand_combination():
 	rng.randomize()
@@ -180,14 +183,19 @@ func generate_rand_combination():
 	solution_term3 = rng.randi_range(1,119)
 
 # play safe tick sound effect
-func play_safe_tick():
+func play_safe_tick(solution = false):
 	# create new stream player and add it to the scene
 	var new_stream_player = AudioStreamPlayer.new()
 	add_child(new_stream_player)
 	
+	var sample_path
+	
 	# choose random tick sound effect
-	var sample_number = rng.randi_range(1,4)
-	var sample_path = "res://sound_assets/Safe-Tick-" + str(sample_number) + ".mp3"
+	if(solution):
+		sample_path = "res://sound_assets/Safe-Solution-Tick.mp3"
+	else:
+		var sample_number = rng.randi_range(1,4)
+		sample_path = "res://sound_assets/Safe-Tick-" + str(sample_number) + ".mp3"
 	
 	# load the random audio path
 	var sound_to_play = load(sample_path)
@@ -211,17 +219,52 @@ func test_solution():
 	else:
 		return false
 
-func change_bus_pitch(combo_term_value, solution_value):
-#	var new_pitch_scale = abs( float(combo_term_value) - solution_value ) + 1
-#	var new_pitch_scale = abs( int(combo_term_value) - solution_value ) + 60
-#	new_pitch_scale = abs( (new_pitch_scale % 120) - 60 )
-#	new_pitch_scale = ( float(new_pitch_scale) / 2000 ) + 1
-#	print(new_pitch_scale)
-#	var bus_pitch = AudioServer.get_bus_effect(AudioServer.get_bus_index("SafeTick"),1)
-#	bus_pitch.pitch_scale = new_pitch_scale
-
-	var new_cutoff = abs( int(combo_term_value) - solution_value ) + 60
-	new_cutoff = abs( (new_cutoff % 120) - 60 )
-	new_cutoff = (new_cutoff * 50) + 1000
+# use the distance from the current_term_value to the solution value to change audio effects based on distance to the solution term
+func tweak_bus_effects(combo_term_value, solution_value):
+	# calculate the shortest angular distance between the current term value and the solution value
+	# the units are (degrees / 3)
+	var solution_distance = abs( int(combo_term_value) - solution_value ) + 60
+	solution_distance = abs( (solution_distance % 120) - 60 )
+	
+	# use formula to change values in the range (0,60) to values in the range (13000,2500)
+	# so a distance of 0 would become 13000 and a distance of 60 would be 2500
+	# this makes the ticks sound fuller the closer you get to the solution_term
+	var new_cutoff = (-175 * solution_distance) + 13000
+	
+	# apply the new cutoff to the audio bus
 	var bus_cutoff = AudioServer.get_bus_effect(AudioServer.get_bus_index("SafeTick"),1)
 	bus_cutoff.cutoff_hz = new_cutoff
+	
+	# use formula to change values in the range (0,60) to values in the range (0,0.15)
+	var new_reverb_wetness = 0.0025 * solution_distance
+	
+	# apply the new cutoff to the audio bus
+	var bus_reverb = AudioServer.get_bus_effect(AudioServer.get_bus_index("SafeTick"),2)
+	bus_reverb.wet = new_reverb_wetness
+
+func reset_game():
+	click_pos = Vector2.ZERO
+	dial_rotation = 0
+
+	prev_term_value = 0
+	current_term_value = 0
+	current_combo_term = 1
+
+	combo_term1 = "000"
+	combo_term2 = "000"
+	combo_term3 = "000"
+
+	prev_term1_text = "000"
+	prev_term2_text = "000"
+	prev_term3_text = "000"
+
+	clockwise = true
+	skip_tolerance = 20
+
+	solution_term1
+	solution_term2
+	solution_term3
+
+	is_dragging = false
+	
+	generate_rand_combination()

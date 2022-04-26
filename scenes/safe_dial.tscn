@@ -3,7 +3,7 @@
 [ext_resource path="res://fonts/SourceSerifPro-Regular.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://art assets/Dial_Outline_1_1.png" type="Texture" id=2]
 [ext_resource path="res://scripts/dial.gd" type="Script" id=3]
-[ext_resource path="res://art assets/Dial1_5.png" type="Texture" id=4]
+[ext_resource path="res://art assets/Dial1_6.png" type="Texture" id=4]
 [ext_resource path="res://art assets/Handle3_1.png" type="Texture" id=5]
 [ext_resource path="res://scripts/handle.gd" type="Script" id=6]
 [ext_resource path="res://scripts/scene_manager.gd" type="Script" id=7]
