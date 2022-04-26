@@ -1,4 +1,4 @@
-[gd_resource type="AudioBusLayout" load_steps=7 format=2]
+[gd_resource type="AudioBusLayout" load_steps=8 format=2]
 
 [sub_resource type="AudioEffectEQ" id=1]
 resource_name = "EQ"
@@ -12,6 +12,10 @@ cutoff_hz = 20500.0
 [sub_resource type="AudioEffectReverb" id=4]
 resource_name = "Reverb"
 wet = 0.14
+
+[sub_resource type="AudioEffectHighPassFilter" id=8]
+resource_name = "HighPassFilter"
+cutoff_hz = 1.0
 
 [sub_resource type="AudioEffectReverb" id=5]
 resource_name = "Reverb"
@@ -42,6 +46,8 @@ bus/1/effect/1/effect = SubResource( 3 )
 bus/1/effect/1/enabled = true
 bus/1/effect/2/effect = SubResource( 4 )
 bus/1/effect/2/enabled = true
+bus/1/effect/3/effect = SubResource( 8 )
+bus/1/effect/3/enabled = true
 bus/2/name = "HandleFail"
 bus/2/solo = false
 bus/2/mute = false
@@ -66,3 +72,9 @@ bus/4/volume_db = 0.0
 bus/4/send = "Master"
 bus/4/effect/0/effect = SubResource( 7 )
 bus/4/effect/0/enabled = true
+bus/5/name = "SolutionTick"
+bus/5/solo = false
+bus/5/mute = false
+bus/5/bypass_fx = false
+bus/5/volume_db = 0.0
+bus/5/send = "Master"

@@ -20,19 +20,5 @@ func _process(delta):
 
 func open_safe():
 	opening_safe = true
-	
-	var new_stream_player = AudioStreamPlayer.new()
-	add_child(new_stream_player)
 
-	# load the random audio path
-	var sound_to_play = load("res://sound_assets/Safe-Opening.mp3")
-	
-	# create new stream player instance to host the sound, then play the sound
-	new_stream_player.stream = sound_to_play
-	new_stream_player.bus = "SafeTick"
-	new_stream_player.play(0.0)
-	
-	# delete node once the sample finishes playing
-	yield(new_stream_player, "finished")
-	new_stream_player.stop()
-	new_stream_player.queue_free()
+	Global.play_sound("res://sound_assets/Safe-Opening.mp3", "SafeTick")

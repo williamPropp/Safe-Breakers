@@ -2,12 +2,12 @@ extends Sprite
 
 var rng = RandomNumberGenerator.new()
 
-var click_pos
-var dial_rotation
+var click_pos = Vector2.ZERO
+var dial_rotation = 0
 
-var prev_term_value
-var current_term_value
-var current_combo_term
+var prev_term_value = 0
+var current_term_value = 0
+var current_combo_term = 1
 
 # combo term label nodes
 onready var term1_label = get_node("../combo_term1")
@@ -16,25 +16,25 @@ onready var term3_label = get_node("../combo_term3")
 
 onready var handle = get_node("../handle")
 
-var combo_term1
-var combo_term2
-var combo_term3
+var combo_term1 = "000"
+var combo_term2 = "000"
+var combo_term3 = "000"
 
-var prev_term1_text
-var prev_term2_text
-var prev_term3_text
+var prev_term1_text = "000"
+var prev_term2_text = "000"
+var prev_term3_text = "000"
 
-var clockwise
-var skip_tolerance
+var clockwise = true
+var skip_tolerance = 20
 
 var solution_term1
 var solution_term2
 var solution_term3
 
-var is_dragging
+var is_dragging = false
 
 func _ready():
-	reset_game()
+	generate_rand_combination()
 
 
 func _process(delta):
@@ -68,6 +68,16 @@ func _process(delta):
 			
 
 func _input(event):
+	# reset game on esc press
+	if Input.is_action_just_pressed("esc"):
+		Global.reset_game()
+	
+	if Input.is_action_just_pressed("cheat"):
+		generate_rand_combination(true)
+	
+	if Input.is_action_just_pressed("left_mouse"):
+		play_safe_tick()
+	
 	# store term value to check for updates
 	prev_term_value = get_term_value()
 	
@@ -173,42 +183,28 @@ func update_combination():
 			play_safe_tick(true)
 		
 # generate random safe combination
-func generate_rand_combination():
+func generate_rand_combination(cheat_mode = false):
 	rng.randomize()
 	solution_term1 = rng.randi_range(1,119)
 	solution_term2 = rng.randi_range(1,119)
 	solution_term3 = rng.randi_range(1,119)
-	
-#	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
-#	print(solution)
+	if(cheat_mode):
+		var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
+		print(solution)
 
 # play safe tick sound effect
 func play_safe_tick(solution = false):
-	# create new stream player and add it to the scene
-	var new_stream_player = AudioStreamPlayer.new()
-	add_child(new_stream_player)
-	
 	var sample_path
 	
 	# choose random tick sound effect
 	if(solution):
 		sample_path = "res://sound_assets/Safe-Solution-Tick.mp3"
+		Global.play_sound(sample_path, "SolutionTick")
 	else:
 		var sample_number = rng.randi_range(1,4)
 		sample_path = "res://sound_assets/Safe-Tick-" + str(sample_number) + ".mp3"
-	
-	# load the random audio path
-	var sound_to_play = load(sample_path)
-	
-	# create new stream player instance to host the sound, then play the sound
-	new_stream_player.stream = sound_to_play
-	new_stream_player.bus = "SafeTick"
-	new_stream_player.play(0.0)
-	
-	# delete node once the sample finishes playing
-	yield(new_stream_player, "finished")
-	new_stream_player.stop()
-	new_stream_player.queue_free()
+		Global.play_sound(sample_path, "SafeTick")
+
 
 func test_solution():
 	var term1_value = int(term1_label.text)
@@ -241,37 +237,16 @@ func tweak_bus_effects(combo_term_value, solution_value):
 	# apply the new cutoff to the audio bus
 	var bus_reverb = AudioServer.get_bus_effect(AudioServer.get_bus_index("SafeTick"),2)
 	bus_reverb.wet = new_reverb_wetness
-
-func reset_game():
-	click_pos = Vector2.ZERO
-	dial_rotation = 0
-	self.rotation = 0
-
-	prev_term_value = 0
-	current_term_value = 0
-	current_combo_term = 1
-
-	combo_term1 = "000"
-	combo_term2 = "000"
-	combo_term3 = "000"
 	
-	term1_label.text = "000"
-	term2_label.text = "000"
-	term3_label.text = "000"
-
-	prev_term1_text = "000"
-	prev_term2_text = "000"
-	prev_term3_text = "000"
-
-	clockwise = true
-	skip_tolerance = 20
-
-	solution_term1
-	solution_term2
-	solution_term3
-
-	is_dragging = false
 	
-	get_parent().rect_position = Vector2(-15,-15)
-	
-	generate_rand_combination()
+#	var bus_hipass = AudioServer.get_bus_effect(AudioServer.get_bus_index("SafeTick"),3)
+#	if(solution_distance < 5):
+#		# use formula to change values in the range (0,4) to values in the range (5000,1000)
+#		var new_hipass_cutoff = (-solution_distance * 100) + 500
+#		print(new_hipass_cutoff)
+#
+#		# apply the new cutoff to the audio bus
+#		bus_hipass.cutoff_hz = new_hipass_cutoff
+#		print(bus_hipass.cutoff_hz)
+#	else:
+#		bus_hipass.cutoff_hz = 1

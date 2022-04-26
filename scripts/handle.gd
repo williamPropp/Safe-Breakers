@@ -40,6 +40,9 @@ func _input(event):
 		elif(!locked):
 			is_dragging = false
 			play_sfx_open_attempt(true)
+			
+			# open safe
+			get_parent().get_parent().open_safe()
 		
 		# convert any rotation angle above or below the range (0,359) to its corresponding angle in that range
 		self.rotation_degrees = ( ( int(self.rotation_degrees) % 360 ) + 360 ) % 360
@@ -66,11 +69,7 @@ func angle_diff(c : Vector2, p0 : Vector2, p1 : Vector2):
 	return angle_delta_deg
 
 # play unlock or locked sound effect
-func play_sfx_open_attempt(success):
-	# create new stream player and add it to the scene
-	var new_stream_player = AudioStreamPlayer.new()
-	add_child(new_stream_player)
-	
+func play_sfx_open_attempt(success = false):
 	var sample_number
 	var sample_path
 	
@@ -78,26 +77,10 @@ func play_sfx_open_attempt(success):
 		# choose random success sound effect
 		sample_number = rng.randi_range(1,2)
 		sample_path = "res://sound_assets/Safe-Success-" + str(sample_number) + ".mp3"
-		new_stream_player.bus = "HandleSuccess"
-		
-		# open safe
-		get_parent().get_parent().open_safe()
+		Global.play_sound(sample_path, "HandleSuccess")
 		
 	else:
 		# choose random fail sound effect
 		sample_number = rng.randi_range(1,4)
-		print(sample_number)
 		sample_path = "res://sound_assets/Safe-Fail-" + str(sample_number) + ".mp3"
-		new_stream_player.bus = "HandleFail"
-	
-	# load the corresponding audio path
-	var sound_to_play = load(sample_path)
-	
-	# create new stream player instance to host the sound, then play the sound
-	new_stream_player.stream = sound_to_play
-	new_stream_player.play(0.0)
-	
-	# delete node once the sample finishes playing
-	yield(new_stream_player, "finished")
-	new_stream_player.stop()
-	new_stream_player.queue_free()
+		Global.play_sound(sample_path, "HandleFail")
