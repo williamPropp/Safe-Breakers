@@ -37,8 +37,8 @@ func _ready():
 #	OS.window_fullscreen = true
 	reset_game()
 	
-#	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
-#	print(solution)
+	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
+	print(solution)
 
 func _process(delta):
 	# on direction change, move on to the next combo term
@@ -245,6 +245,7 @@ func tweak_bus_effects(combo_term_value, solution_value):
 func reset_game():
 	click_pos = Vector2.ZERO
 	dial_rotation = 0
+	self.rotation = 0
 
 	prev_term_value = 0
 	current_term_value = 0
@@ -253,6 +254,10 @@ func reset_game():
 	combo_term1 = "000"
 	combo_term2 = "000"
 	combo_term3 = "000"
+	
+	term1_label.text = "000"
+	term2_label.text = "000"
+	term3_label.text = "000"
 
 	prev_term1_text = "000"
 	prev_term2_text = "000"
@@ -266,5 +271,7 @@ func reset_game():
 	solution_term3
 
 	is_dragging = false
+	
+	get_parent().rect_position = Vector2(-15,-15)
 	
 	generate_rand_combination()

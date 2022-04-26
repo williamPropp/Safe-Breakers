@@ -1,4 +1,4 @@
-[gd_resource type="AudioBusLayout" load_steps=6 format=2]
+[gd_resource type="AudioBusLayout" load_steps=7 format=2]
 
 [sub_resource type="AudioEffectEQ" id=1]
 resource_name = "EQ"
@@ -21,6 +21,12 @@ wet = 0.02
 [sub_resource type="AudioEffectReverb" id=6]
 resource_name = "Reverb"
 room_size = 0.45
+wet = 0.02
+
+[sub_resource type="AudioEffectReverb" id=7]
+resource_name = "Reverb"
+room_size = 0.26
+spread = 0.59
 wet = 0.02
 
 [resource]
@@ -52,3 +58,11 @@ bus/3/volume_db = 0.662756
 bus/3/send = "Master"
 bus/3/effect/0/effect = SubResource( 6 )
 bus/3/effect/0/enabled = true
+bus/4/name = "Gems"
+bus/4/solo = false
+bus/4/mute = false
+bus/4/bypass_fx = false
+bus/4/volume_db = 0.0
+bus/4/send = "Master"
+bus/4/effect/0/effect = SubResource( 7 )
+bus/4/effect/0/enabled = true

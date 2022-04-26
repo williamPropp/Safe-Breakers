@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/Gem-Ting-3.mp3-08e1cb5c88cbf240a1e71b70ba508abd.mp3str"
+
+[deps]
+
+source_file="res://sound_assets/Gem-Ting-3.mp3"
+dest_files=[ "res://.import/Gem-Ting-3.mp3-08e1cb5c88cbf240a1e71b70ba508abd.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0

@@ -79,6 +79,10 @@ func play_sfx_open_attempt(success):
 		sample_number = rng.randi_range(1,2)
 		sample_path = "res://sound_assets/Safe-Success-" + str(sample_number) + ".mp3"
 		new_stream_player.bus = "HandleSuccess"
+		
+		# open safe
+		get_parent().get_parent().opening_safe = true
+		
 	else:
 		# choose random fail sound effect
 		sample_number = rng.randi_range(1,4)
