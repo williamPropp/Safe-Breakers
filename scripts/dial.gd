@@ -34,11 +34,8 @@ var solution_term3
 var is_dragging
 
 func _ready():
-#	OS.window_fullscreen = true
 	reset_game()
-	
-	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
-	print(solution)
+
 
 func _process(delta):
 	# on direction change, move on to the next combo term
@@ -181,6 +178,9 @@ func generate_rand_combination():
 	solution_term1 = rng.randi_range(1,119)
 	solution_term2 = rng.randi_range(1,119)
 	solution_term3 = rng.randi_range(1,119)
+	
+#	var solution = str(solution_term1) + " " + str(solution_term2) + " " + str(solution_term3)
+#	print(solution)
 
 # play safe tick sound effect
 func play_safe_tick(solution = false):

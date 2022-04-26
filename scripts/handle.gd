@@ -81,7 +81,7 @@ func play_sfx_open_attempt(success):
 		new_stream_player.bus = "HandleSuccess"
 		
 		# open safe
-		get_parent().get_parent().opening_safe = true
+		get_parent().get_parent().open_safe()
 		
 	else:
 		# choose random fail sound effect

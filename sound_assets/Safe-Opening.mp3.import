@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/Safe-Opening.mp3-cc9cb7658075d6f3078a1f842314628b.mp3str"
+
+[deps]
+
+source_file="res://sound_assets/Safe-Opening.mp3"
+dest_files=[ "res://.import/Safe-Opening.mp3-cc9cb7658075d6f3078a1f842314628b.mp3str" ]
+
+[params]
+
+loop=false
+loop_offset=0
