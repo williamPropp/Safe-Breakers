@@ -12,13 +12,14 @@ onready var gem_blue = get_node("../gem-blue")
 
 onready var safe_interior = get_parent()
 
+var safe_open = false;
+
 var slide_speed = 20
 var slide_coefficient = 0
 var slide_counter = 0.01
 
-
 func _input(event):
-	if Input.is_action_just_pressed("left_mouse") && get_rect().has_point(to_local(event.position)):
+	if Input.is_action_just_pressed("left_mouse") && (get_rect().has_point(to_local(event.position)) && safe_open):
 		taken = true
 		play_ting_sound()
 
@@ -57,4 +58,8 @@ func play_ting_sound():
 
 	var sample_path = "res://sound_assets/Gem-Ting-" + str(sample_index) + ".mp3"
 	
+<<<<<<< Updated upstream
 	Global.play_sound(sample_path, "Gems")
+=======
+	safe_open = false
+>>>>>>> Stashed changes

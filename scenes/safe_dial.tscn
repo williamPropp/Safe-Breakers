@@ -74,6 +74,7 @@ tab_size = 7
 text = "000"
 
 [node name="bg_interior" type="Sprite" parent="."]
+pause_mode = 1
 scale = Vector2( 0.768657, 0.768657 )
 texture = ExtResource( 9 )
 centered = false

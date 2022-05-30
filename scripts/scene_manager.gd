@@ -21,4 +21,23 @@ func _process(delta):
 func open_safe():
 	opening_safe = true
 
+<<<<<<< Updated upstream
 	Global.play_sound("res://sound_assets/Safe-Opening.mp3", "SafeTick")
+=======
+	# load the random audio path
+	var sound_to_play = load("res://sound_assets/Safe-Opening.mp3")
+	
+	# create new stream player instance to host the sound, then play the sound
+	new_stream_player.stream = sound_to_play
+	new_stream_player.bus = "SafeTick"
+	new_stream_player.play(0.0)
+	
+	get_node("bg_interior/gem-pink").safe_open = true
+	get_node("bg_interior/gem-yellow").safe_open = true
+	get_node("bg_interior/gem-blue").safe_open = true
+	
+	# delete node once the sample finishes playing
+	yield(new_stream_player, "finished")
+	new_stream_player.stop()
+	new_stream_player.queue_free()
+>>>>>>> Stashed changes
